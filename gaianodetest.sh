@@ -56,27 +56,21 @@ check_nvidia_gpu() {
     fi
 }
 
-# Function to install CUDA Toolkit 12.8 with progress display
+# Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
 install_cuda() {
-    echo "🔄 Installing CUDA Toolkit 12.8..."
-
     if $IS_WSL; then
         echo "🖥️ Installing CUDA for WSL 2..."
-        wget --progress=bar:force -O cuda-wsl-ubuntu.pin https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+        wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
         sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-
-        wget --progress=bar:force -O cuda-wsl.deb https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
-        sudo dpkg -i cuda-wsl.deb
-
+        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
+        sudo dpkg -i cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
         sudo cp /var/cuda-repo-wsl-ubuntu-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     else
         echo "🖥️ Installing CUDA for Ubuntu 24.04..."
-        wget --progress=bar:force -O cuda-ubuntu2404.pin https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
         sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-
-        wget --progress=bar:force -O cuda-ubuntu.deb https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-        sudo dpkg -i cuda-ubuntu.deb
-
+        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+        sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
         sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     fi
 
@@ -90,13 +84,11 @@ setup_cuda_env() {
     echo "🔧 Setting up CUDA environment variables..."
     echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' >> ~/.bashrc
     echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
-    source ~/.bashrc  # ✅ Ensure the new paths are applied immediately
+    source ~/.bashrc
 }
 
 # Function to check CUDA version and install GaiaNet accordingly
-install_gaianet_with_cuda() {
-    source ~/.bashrc  # ✅ Load CUDA paths before checking `nvcc`
-    
+get_cuda_version() {
     if command -v nvcc &> /dev/null; then
         CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)  
         echo "✅ CUDA version detected: $CUDA_VERSION"
@@ -114,11 +106,8 @@ install_gaianet_with_cuda() {
     else
         echo "⚠️ CUDA not found. Installing CUDA Toolkit 12.8..."
         install_cuda
-        source ~/.bashrc  # ✅ Reload after installation
-        install_gaianet_with_cuda  # ✅ Retry after CUDA install
     fi
 }
-
 # Function to check if the system is a VPS or Laptop
 check_if_vps_or_laptop() {
     vps_type=$(systemd-detect-virt)
@@ -155,18 +144,20 @@ else
     config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
 fi
 
-# Install GaiaNet once, only after determining correct configuration
+# Run checks and installations
 if check_nvidia_gpu; then
-    setup_cuda_env
-    install_gaianet_with_cuda
+    setup_cuda_env  # ✅ Set up CUDA environment first
+    get_cuda_version  # ✅ Now check CUDA version
+    install_gaianet
+    add_gaianet_to_path
+    echo "⚙️ Initializing GaiaNet node with CUDA..."
+    ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 else
     install_gaianet
+    add_gaianet_to_path
+    echo "⚙️ Initializing GaiaNet node without CUDA..."
+    ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 fi
-
-add_gaianet_to_path
-
-echo "⚙️ Initializing GaiaNet node..."
-~/gaianet/bin/gaianet init --config "$config_url" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
