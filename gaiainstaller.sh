@@ -95,6 +95,7 @@ check_if_vps_or_laptop() {
         echo "✅ This is a Desktop."
         return 1  # Desktop detected
     fi
+}
 
 # Check if system is a VPS or Laptop
 if check_if_vps_or_laptop; then
