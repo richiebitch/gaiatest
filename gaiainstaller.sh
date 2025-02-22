@@ -17,15 +17,15 @@ echo -e "\e[1;97m✨ Your GPU, CPU & RAM Specs Matter for Optimal Performance! �
 echo "==================================================="
 
 # Stylish Performance & Requirement Section
-echo -e "\e[1;96m⏱ Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
+echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
 echo -e "\e[1;91m⚠️ Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
 echo -e "\e[1;94m☁️ VPS Requirements: Minimum 8 Core+ CPU & 6-8GB RAM - Higher is Better! ⚡\e[0m"
 echo -e "\e[1;92m💻 PC/Desktop/Laptop: GPU RTX 20/30/40/50 Series Supported! 🚀\e[0m"
 echo "==================================================="
 
-echo -e "\e[1;33m🖥️ Desktop GPU Users = Earn Higher Points – Desktop GPUs are 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
-echo -e "\e[1;33m💻 Laptop GPU Users = Earn More Points Than Non-GPU Users 🚀💸\e[0m"
-echo -e "\e[1;33m🌐 VPS/Non-GPU Users = Earn Good Points Based on VPS Specifications ⚙️📊\e[0m"
+echo -e "\e[1;33m🖥️  Desktop GPU Users = Earn Higher Points – Desktop GPUs are 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
+echo -e "\e[1;33m💻  Laptop GPU Users = Earn More Points Than Non-GPU Users 🚀💸\e[0m"
+echo -e "\e[1;33m🌐  VPS/Non-GPU Users = Earn Good Points Based on VPS Specifications ⚙️📊\e[0m"
 echo "==================================================="
 echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
 echo "==================================================="
