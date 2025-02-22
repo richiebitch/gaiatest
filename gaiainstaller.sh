@@ -62,8 +62,6 @@ while true; do
         3)
             echo "Detecting system configuration..."
 
-            #!/bin/bash
-
 # Function to check if the system is a VPS or Laptop
 check_if_vps_or_laptop() {
     vps_type=$(systemd-detect-virt)
