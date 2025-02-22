@@ -101,16 +101,16 @@ while true; do
 
             # Check if system is a VPS or Laptop
             if check_if_vps_or_laptop; then
-                script_name="gaiabotga.sh"
+                script_name="gaiachat.sh"
                 echo "🚀 Running VPS/Laptop version of Domain Chat..."
             else
                 # Check for GPU on Desktop
                 if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
                     echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-                    script_name="gaiabotga1.sh"
+                    script_name="gaiachat1.sh"
                 else
                     echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-                    script_name="gaiabotga.sh"
+                    script_name="gaiachat.sh"
                 fi
             fi
 
@@ -121,7 +121,7 @@ while true; do
 
             # If no existing screen was selected, start a new one
             screen -dmS gaiabot bash -c '
-            curl -O https://raw.githubusercontent.com/abhiag/Gaia_Node/main/'"$script_name"' && chmod +x '"$script_name"';
+            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
             if [ -f "'"$script_name"'" ]; then
                 ./'"$script_name"'
                 exec bash  # Keeps the session open
