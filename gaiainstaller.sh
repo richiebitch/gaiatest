@@ -23,7 +23,7 @@ echo -e "\e[1;94m☁️ VPS Requirements: Minimum 8 Core+ CPU & 6-8GB RAM - High
 echo -e "\e[1;92m💻 PC/Desktop/Laptop: GPU RTX 20/30/40/50 Series Supported! 🚀\e[0m"
 echo "==================================================="
 
-echo -e "\e[1;33m🖥️ Desktop GPU Users = Earn More Points – Desktop GPUs are 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
+echo -e "\e[1;33m🖥️ Desktop GPU Users = Earn Higher Points – Desktop GPUs are 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
 echo -e "\e[1;33m💻 Laptop GPU Users = Earn More Points Than Non-GPU Users 🚀💸\e[0m"
 echo -e "\e[1;33m🌐 VPS/Non-GPU Users = Earn Good Points Based on VPS Specifications ⚙️📊\e[0m"
 echo "==================================================="
@@ -31,8 +31,8 @@ echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active f
 echo "==================================================="
 
 echo -e "\n\e[1mPress a number to perform an action:\e[0m\n"
-echo -e "1) \e[1;36m 🎮 Install Gaia-Node for NVIDIA Desktop GPU (RTX 20/30/40/50 Series Support) \e[0m"
-echo -e "2) \e[1;36m 🖥️ Install Gaia-Node for VPS & Laptop GPU Users (RTX 20/30/40/50 Series Support) \e[0m"
+echo -e "1) \e[1;36m 🎮 Install Gaia-Node for Desktop NVIDIA GPU Users \e[0m"
+echo -e "2) \e[1;36m 🖥️ Install Gaia-Node for VPS & Laptop Users \e[0m"
 echo -e "3) \e[1;94m 🤖 Detect System Configuration & Setup Chatbot \e[0m"
 echo -e "4) \e[1;95m 🔍 Switch to Active Screens \e[0m"
 echo -e "5) \e[1;31m 🚨 Terminate All Active GaiaNet Screens \e[0m"
