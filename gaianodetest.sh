@@ -33,31 +33,8 @@ RESET="\033[0m"
 
 # Ensure required packages are installed
 echo "📦 Installing dependencies..."
-sudo apt update -y && sudo apt upgrade -y
-sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config
-
-# Function to check if an NVIDIA GPU is present
-check_nvidia_gpu() {
-    if command -v nvidia-smi &> /dev/null; then
-        echo "✅ NVIDIA GPU detected."
-        return 0
-    else
-        echo "⚠️ No NVIDIA GPU found."
-        return 1
-    fi
-}
-
-# Function to detect CUDA version
-get_cuda_version() {
-    if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)
-        echo "✅ CUDA version detected: $CUDA_VERSION"
-        echo "$CUDA_VERSION"
-    else
-        echo "⚠️ CUDA not found."
-        echo "0"
-    fi
-}
+sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget
+sudo apt update && sudo apt install -y build-essential libglvnd-dev pkg-config
 
 # Detect if running inside WSL
 IS_WSL=false
@@ -68,19 +45,46 @@ else
     echo "🖥️ Running on a native Ubuntu system."
 fi
 
-# Function to install CUDA Toolkit 12.8 and set up environment
-install_cuda() {
-    echo "🔧 Fixing and updating system before CUDA installation..."
-    sudo apt update -y && sudo apt upgrade -y
+# Function to check if an NVIDIA GPU is present
+check_nvidia_gpu() {
+    if command -v nvidia-smi &> /dev/null; then
+        echo "✅ NVIDIA GPU detected."
+        return 0
+    elif lspci | grep -i nvidia &> /dev/null; then
+        echo "✅ NVIDIA GPU detected (via lspci)."
+        return 0
+    else
+        echo "⚠️ No NVIDIA GPU found."
+        return 1
+    fi
+}
 
-    echo "🖥️ Installing CUDA Toolkit 12.8..."
+# Function to check if the system is a VPS, Laptop, or Desktop
+check_system_type() {
+    vps_type=$(systemd-detect-virt)
+    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+        echo "✅ This is a VPS."
+        return 0  # VPS
+    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+        echo "✅ This is a Laptop."
+        return 1  # Laptop
+    else
+        echo "✅ This is a Desktop."
+        return 2  # Desktop
+    fi
+}
+
+# Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
+install_cuda() {
     if $IS_WSL; then
+        echo "🖥️ Installing CUDA for WSL 2..."
         wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
         sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
         wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
         sudo dpkg -i cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
         sudo cp /var/cuda-repo-wsl-ubuntu-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     else
+        echo "🖥️ Installing CUDA for Ubuntu 24.04..."
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
         sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
         wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
@@ -101,60 +105,90 @@ setup_cuda_env() {
     source ~/.bashrc
 }
 
-# Function to check if the system is a VPS, Laptop, or Desktop
-check_system_type() {
-    vps_type=$(systemd-detect-virt)
-    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-        echo "✅ This is a VPS."
-        return 0  # VPS
-    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-        echo "✅ This is a Laptop."
-        return 1  # Laptop
+# Function to check CUDA version and install GaiaNet accordingly
+get_cuda_version() {
+    if command -v nvcc &> /dev/null; then
+        CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)  
+        echo "✅ CUDA version detected: $CUDA_VERSION"
+
+        if [[ "$CUDA_VERSION" == "11" ]]; then
+            echo "🔧 Installing GaiaNet with ggmlcuda 11..."
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 11
+        elif [[ "$CUDA_VERSION" == "12" ]]; then
+            echo "🔧 Installing GaiaNet with ggmlcuda 12..."
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 12
+        else
+            echo "⚠️ Unsupported CUDA version detected. Exiting..."
+            exit 1
+        fi
     else
-        echo "✅ This is a Desktop."
-        return 2  # Desktop
+        echo "⚠️ CUDA not found. Installing CUDA Toolkit 12.8..."
+        install_cuda
     fi
 }
 
-# Install GaiaNet based on CUDA version or system type
-CUDA_VERSION=$(get_cuda_version)
-if [[ "$CUDA_VERSION" == "11" ]]; then
-    echo "🔧 Installing GaiaNet with ggmlcuda 11..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 11
-elif [[ "$CUDA_VERSION" == "12" ]]; then
-    echo "🔧 Installing GaiaNet with ggmlcuda 12..."
-    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 12
-else
-    echo "🔧 Installing CUDA Toolkit 12.8..."
-    install_cuda
-    echo "🔧 Installing GaiaNet without CUDA (VPS or no GPU)..."
+# Function to install GaiaNet
+install_gaianet() {
+    echo "📥 Installing GaiaNet node..."
     curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
+}
+
+# Function to add GaiaNet to PATH
+add_gaianet_to_path() {
+    echo 'export PATH=$HOME/gaianet/bin:$PATH' >> ~/.bashrc
+    source ~/.bashrc
+}
+
+# Run checks and installations
+if check_nvidia_gpu; then
+    setup_cuda_env  # ✅ Set up CUDA environment first
+    get_cuda_version  # ✅ Now check CUDA version
+    install_gaianet
+    add_gaianet_to_path
+
+    # Determine system type and set configuration URL
+    check_system_type
+    case $? in
+        0)  # VPS
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            ;;
+        1)  # Laptop
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            ;;
+        2)  # Desktop
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+            ;;
+    esac
+
+    echo "⚙️ Initializing GaiaNet node with CUDA..."
+    ~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+else
+    install_gaianet
+    add_gaianet_to_path
+
+    # Determine system type and set configuration URL
+    check_system_type
+    case $? in
+        0)  # VPS
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            ;;
+        1)  # Laptop
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            ;;
+        2)  # Desktop
+            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+            ;;
+    esac
+
+    echo "⚙️ Initializing GaiaNet node without CUDA..."
+    ~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 fi
-
-# Set up correct GaiaNet configuration
-check_system_type
-case $? in
-    0)
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-        ;;
-    1)
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-        ;;
-    2)
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-        ;;
-esac
-
-# Initialize GaiaNet with the selected configuration
-echo "⚙️ Initializing GaiaNet node..."
-~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
 ~/gaianet/bin/gaianet config --domain gaia.domains
 ~/gaianet/bin/gaianet start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
-# Fetch GaiaNet node information
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 
