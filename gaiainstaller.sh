@@ -54,11 +54,10 @@ echo "==================================================="
 
   read -p "Enter your choice: " choice
 
-echo "==================================================="
 echo -e "\e[1;97m 📢 Stay updated: \e[0m"                                                       
 echo -e "\e[1;97m Follow us on Telegram: https://t.me/GaCryptOfficial \e[0m"                            
 echo -e "\e[1;97m Follow us on X: https://x.com/GACryptoO \e[0m"
-echo "==================================================="
+
 
 case $choice in
     1)
@@ -192,10 +191,9 @@ esac
 
 read -p "Press Enter to return to the main menu..."
 
-echo "==================================================="
 echo -e "\e[1;97m 📢 Stay updated: \e[0m"                                                       
 echo -e "\e[1;97m Follow us on Telegram: https://t.me/GaCryptOfficial \e[0m"                            
 echo -e "\e[1;97m Follow us on X: https://x.com/GACryptoO \e[0m"
-echo "==================================================="
+
 
 done
