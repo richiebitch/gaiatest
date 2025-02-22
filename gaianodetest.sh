@@ -84,7 +84,7 @@ install_cuda() {
     sudo apt-get update
 
     echo "📥 Installing CUDA Toolkit 12.8 (this may take a while)..."
-    sudo apt-get -y install cuda-toolkit-12-8
+    sudo apt-get -y install cuda-toolkit
 
     setup_cuda_env
 }
