@@ -62,21 +62,6 @@ while true; do
         3)
             echo "Detecting system configuration..."
 
-# Function to check if the system is a VPS or Laptop
-check_if_vps_or_laptop() {
-    vps_type=$(systemd-detect-virt)
-    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-        echo "✅ This is a VPS."
-        return 0  # VPS detected
-    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-        echo "✅ This is a Laptop."
-        return 0  # Laptop detected
-    else
-        echo "✅ This is a Desktop."
-        return 1  # Desktop detected
-    fi
-}
-
 # Check if GaiaNet is installed
 if ! command -v gaianet &> /dev/null; then
     echo "❌ GaiaNet is not installed. Please install it first."
@@ -96,6 +81,20 @@ else
     echo "❌ GaiaNet is not installed properly. Please check your installation."
     exit 1
 fi
+
+# Function to check if the system is a VPS or Laptop
+check_if_vps_or_laptop() {
+    vps_type=$(systemd-detect-virt)
+    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+        echo "✅ This is a VPS."
+        return 0  # VPS detected
+    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+        echo "✅ This is a Laptop."
+        return 0  # Laptop detected
+    else
+        echo "✅ This is a Desktop."
+        return 1  # Desktop detected
+    fi
 
 # Check if system is a VPS or Laptop
 if check_if_vps_or_laptop; then
