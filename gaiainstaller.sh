@@ -165,40 +165,40 @@ sleep 2
 screen -r gaiabot
 
         4)
-            echo "Checking for active screen sessions..."
-            mapfile -t active_screens < <(screen -list | grep -o '[0-9]*\.[^ ]*')
+        echo "Checking for active screen sessions..."
+        mapfile -t active_screens < <(screen -list | grep -o '[0-9]*\.[^ ]*')
 
-            if [[ ${#active_screens[@]} -gt 0 ]]; then
-                echo "Active screens detected:"
-                for i in "${!active_screens[@]}"; do
-                    screen_id=$(echo "${active_screens[i]}" | cut -d. -f1)
-                    screen_name=$(echo "${active_screens[i]}" | cut -d. -f2)
-                    echo "$((i+1))) Screen ID: $screen_id - Name: $screen_name"
-                done
+        if [[ ${#active_screens[@]} -gt 0 ]]; then
+            echo "Active screens detected:"
+            for i in "${!active_screens[@]}"; do
+                screen_id=$(echo "${active_screens[i]}" | cut -d. -f1)
+                screen_name=$(echo "${active_screens[i]}" | cut -d. -f2)
+                echo "$((i+1))) Screen ID: $screen_id - Name: $screen_name"
+            done
 
-                echo "Enter the number to switch to the corresponding screen (or type 'Exit' to return to the main menu):"
-                read screen_choice
+            echo "Enter the number to switch to the corresponding screen (or type 'Exit' to return to the main menu):"
+            read screen_choice
 
-                if [[ "$screen_choice" == "Exit" ]]; then
-                    echo "🔄 Returning to the main menu..."
-                    rm -rf GaiaNodeInstallet.sh
-                    curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/GaiaNodeInstallet.sh
-                    chmod +x GaiaNodeInstallet.sh
-                    exec ./GaiaNodeInstallet.sh  # Replace current process with the installer
-                elif [[ "$screen_choice" =~ ^[0-9]+$ ]] && (( screen_choice > 0 && screen_choice <= ${#active_screens[@]} )); then
-                    selected_screen=${active_screens[screen_choice-1]}
-                    screen_id=$(echo "$selected_screen" | cut -d. -f1)
-                    echo "Switching to screen ID $screen_id..."
-                    screen -d -r "$screen_id"
-                else
-                    echo "❌ Invalid selection. Please try again."
-                fi
+            if [[ "$screen_choice" == "Exit" ]]; then
+                echo "🔄 Returning to the main menu..."
+                rm -rf GaiaNodeInstallet.sh
+                curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/GaiaNodeInstallet.sh
+                chmod +x GaiaNodeInstallet.sh
+                ./GaiaNodeInstallet.sh  # Removed 'exec' to avoid script termination
+            elif [[ "$screen_choice" =~ ^[0-9]+$ ]] && (( screen_choice > 0 && screen_choice <= ${#active_screens[@]} )); then
+                selected_screen=${active_screens[screen_choice-1]}
+                screen_id=$(echo "$selected_screen" | cut -d. -f1)
+                echo "Switching to screen ID $screen_id..."
+                screen -d -r "$screen_id"
             else
-                echo "⚠️ No active screens found."
-                break  # Exit the loop if no screens are active
+                echo "❌ Invalid selection. Please try again."
             fi
-            ;;
-           esac
+        else
+            echo "⚠️ No active screens found."
+        fi
+        ;;  # Correct placement of ';;'
+esac  # Ensure 'esac' closes the case statement
+
         5)
             echo "Restarting GaiaNet Node..."
             gaianet stop
