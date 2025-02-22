@@ -62,6 +62,7 @@ while true; do
             ;;
 
         3)
+        3)
             echo "Detecting system configuration..."
 
             # Check if GaiaNet is installed
@@ -105,7 +106,7 @@ while true; do
                 echo "🚀 Running VPS/Laptop version of Domain Chat..."
             else
                 # Check for GPU on Desktop
-                if command -v nvidia-smi &> /dev/null && nvidia-smi -L &> /dev/null; then
+                if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
                     echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
                     script_name="gaiabotga1.sh"
                 else
@@ -114,14 +115,24 @@ while true; do
                 fi
             fi
 
-            # Remove old script if it exists and run the new one
+            # Remove old script if it exists and download the new one
             if [[ -f ~/$script_name ]]; then
                 rm -rf ~/$script_name
             fi
 
-            # Execute the chosen script
-            bash ~/$script_name
+            # If no existing screen was selected, start a new one
+            screen -dmS gaiabot bash -c '
+            curl -O https://raw.githubusercontent.com/abhiag/Gaia_Node/main/'"$script_name"' && chmod +x '"$script_name"';
+            if [ -f "'"$script_name"'" ]; then
+                ./'"$script_name"'
+                exec bash  # Keeps the session open
+            else
+                echo "❌ Error: Failed to download '"$script_name"'"
+                sleep 10  # Pause before exit
+            fi'
 
+            sleep 2
+            screen -r gaiabot
             ;;
 
         4)
