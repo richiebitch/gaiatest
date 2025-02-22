@@ -47,11 +47,8 @@ fi
 
 # Function to check if an NVIDIA GPU is present
 check_nvidia_gpu() {
-    if command -v nvidia-smi &> /dev/null; then
+    if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
         echo "✅ NVIDIA GPU detected."
-        return 0
-    elif lspci | grep -i nvidia &> /dev/null; then
-        echo "✅ NVIDIA GPU detected (via lspci)."
         return 0
     else
         echo "⚠️ No NVIDIA GPU found."
@@ -59,20 +56,20 @@ check_nvidia_gpu() {
     fi
 }
 
-# Function to install CUDA Toolkit 12.8 in WSL or Ubuntu 24.04
+# Function to install CUDA Toolkit 12.8
 install_cuda() {
     if $IS_WSL; then
         echo "🖥️ Installing CUDA for WSL 2..."
-        wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+        wget -q https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
         sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
+        wget -q https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
         sudo dpkg -i cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
         sudo cp /var/cuda-repo-wsl-ubuntu-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     else
         echo "🖥️ Installing CUDA for Ubuntu 24.04..."
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+        wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
         sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+        wget -q https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
         sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
         sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     fi
@@ -116,13 +113,13 @@ get_cuda_version() {
 check_if_vps_or_laptop() {
     vps_type=$(systemd-detect-virt)
     if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-        echo "This is a VPS."
+        echo "✅ This is a VPS."
         return 0  # VPS detected
     elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-        echo "This is a Laptop."
+        echo "✅ This is a Laptop."
         return 0  # Laptop detected
     else
-        echo "This is a Desktop."
+        echo "✅ This is a Desktop."
         return 1  # Desktop detected
     fi
 }
@@ -130,29 +127,8 @@ check_if_vps_or_laptop() {
 # Function to install GaiaNet
 install_gaianet() {
     echo "📥 Installing GaiaNet..."
-    # Add installation steps here
+    curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
 }
-
-# Run system type check
-if check_if_vps_or_laptop; then
-    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-else
-    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-fi
-
-# Run checks and installations
-if check_nvidia_gpu; then
-    setup_cuda_env  # ✅ Set up CUDA environment first
-    get_cuda_version  # ✅ Now check CUDA version
-    install_gaianet
-    echo "⚙️ Initializing GaiaNet node with CUDA..."
-else
-    install_gaianet
-    echo "⚙️ Initializing GaiaNet node without CUDA..."
-fi
-
-# Initialize GaiaNet with the correct config
-~/gaianet/bin/gaianet init --config "$config_url" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Function to add GaiaNet to PATH
 add_gaianet_to_path() {
@@ -160,20 +136,31 @@ add_gaianet_to_path() {
     source ~/.bashrc
 }
 
-# Run checks and installations
-if check_nvidia_gpu; then
-    setup_cuda_env  # ✅ Set up CUDA environment first
-    get_cuda_version  # ✅ Now check CUDA version
-    install_gaianet
-    add_gaianet_to_path
-    echo "⚙️ Initializing GaiaNet node with CUDA..."
-    ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+# Determine correct config file based on system type and GPU presence
+if check_if_vps_or_laptop; then
+    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
 else
-    install_gaianet
-    add_gaianet_to_path
-    echo "⚙️ Initializing GaiaNet node without CUDA..."
-    ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    if check_nvidia_gpu; then
+        config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+    else
+        config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+    fi
 fi
+
+# Run checks and installations
+install_gaianet
+add_gaianet_to_path
+
+if check_nvidia_gpu; then
+    setup_cuda_env
+    get_cuda_version
+    echo "⚙️ Initializing GaiaNet node with CUDA..."
+else
+    echo "⚙️ Initializing GaiaNet node without CUDA..."
+fi
+
+# Initialize GaiaNet with the correct config
+~/gaianet/bin/gaianet init --config "$config_url" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
@@ -189,8 +176,3 @@ echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
 echo "🌟 Stay connected: Telegram: https://t.me/GaCryptOfficial | Twitter: https://x.com/GACryptoO"
 echo "💪 Together, let's build the future of decentralized networks!"
 echo "===========================================================" 
-echo "==========================================================="
-echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
-echo "🌟 Stay connected: Telegram: https://t.me/GaCryptOfficial | Twitter: https://x.com/GACryptoO"
-echo "💪 Together, let's build the future of decentralized networks!"
-echo "==========================================================="
