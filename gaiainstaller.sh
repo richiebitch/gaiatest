@@ -95,7 +95,7 @@ check_if_vps_or_laptop() {
         echo "✅ This is a Desktop."
         return 1  # Desktop detected
     fi
-}
+}  # <-- Closing brace fixed here ✅
 
 # Check if system is a VPS or Laptop
 if check_if_vps_or_laptop; then
@@ -120,49 +120,49 @@ fi
 # Execute the chosen script
 bash ~/$script_name
 
-            # Check for existing GaiaBot screen sessions
-            existing_screens=$(screen -ls | grep gaiabot | awk '{print $1}')
+# Check for existing GaiaBot screen sessions
+existing_screens=$(screen -ls 2>/dev/null | grep gaiabot | awk '{print $1}')
 
-            if [ -n "$existing_screens" ]; then
-                echo "✅ Found existing GaiaBot screen sessions:"
-                select screen_choice in $existing_screens "Start New Session" "Exit"; do
-                    case "$screen_choice" in
-                        "Start New Session")
-                            echo "🚀 Starting a new GaiaBot session..."
-                            break
-                            ;;
-                        "Exit")
-                            rm -rf GaiaNodeInstallet.sh
-                            curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/GaiaNodeInstallet.sh
-                            chmod +x GaiaNodeInstallet.sh
-                            exec ./GaiaNodeInstallet.sh  # Replace current process with the installer
-                            ;;
-                        *)
-                            if [[ -n "$screen_choice" ]]; then
-                                echo "🔄 Switching to selected screen: $screen_choice"
-                                screen -r "$screen_choice"
-                                exit
-                            else
-                                echo "⚠️ Invalid choice. Please try again."
-                            fi
-                            ;;
-                    esac
-                done
-            fi
+if [ -n "$existing_screens" ]; then
+    echo "✅ Found existing GaiaBot screen sessions:"
+    select screen_choice in $existing_screens "Start New Session" "Exit"; do
+        case "$screen_choice" in
+            "Start New Session")
+                echo "🚀 Starting a new GaiaBot session..."
+                break
+                ;;
+            "Exit")
+                rm -rf GaiaNodeInstallet.sh
+                curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/GaiaNodeInstallet.sh
+                chmod +x GaiaNodeInstallet.sh
+                ./GaiaNodeInstallet.sh  # Removed 'exec' to allow script continuation
+                ;;
+            *)
+                if [[ -n "$screen_choice" ]]; then
+                    echo "🔄 Switching to selected screen: $screen_choice"
+                    screen -r "$screen_choice"
+                    exit
+                else
+                    echo "⚠️ Invalid choice. Please try again."
+                fi
+                ;;
+        esac
+    done
+fi
 
-            # If no existing screen was selected, start a new one
-            screen -dmS gaiabot bash -c '
-            curl -O https://raw.githubusercontent.com/abhiag/Gaia_Node/main/'"$script_name"' && chmod +x '"$script_name"';
-            if [ -f "'"$script_name"'" ]; then
-                ./'"$script_name"'
-                exec bash  # Keeps the session open
-            else
-                echo "❌ Error: Failed to download '"$script_name"'"
-                sleep 10  # Pause before exit
-            fi'
+# If no existing screen was selected, start a new one
+screen -dmS gaiabot bash -c '
+curl -O https://raw.githubusercontent.com/abhiag/Gaia_Node/main/'"$script_name"' && chmod +x '"$script_name"';
+if [ -f "'"$script_name"'" ]; then
+    ./'"$script_name"'
+    exec bash  # Keeps the session open
+else
+    echo "❌ Error: Failed to download '"$script_name"'"
+    sleep 10  # Pause before exit
+fi'
 
-            sleep 2
-            screen -r gaiabot
+sleep 2
+screen -r gaiabot
 
         4)
             echo "Checking for active screen sessions..."
