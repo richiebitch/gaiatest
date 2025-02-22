@@ -144,21 +144,28 @@ else
     config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
 fi
 
-# Run checks and installations
+# Determine correct config file based on system type and GPU presence
+if check_if_vps_or_laptop; then
+    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+elif check_nvidia_gpu; then
+    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+else
+    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+fi
+
+# Install GaiaNet once, only after determining correct configuration
 if check_nvidia_gpu; then
-    setup_cuda_env  # ✅ Set up CUDA environment first
-    get_cuda_version  # ✅ Now check CUDA version
-    install_gaianet
-    add_gaianet_to_path
+    setup_cuda_env
+    get_cuda_version
     check_if_vps_or_laptop
-    echo "⚙️ Initializing GaiaNet node with CUDA..."
-    ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 else
     install_gaianet
-    add_gaianet_to_path
-    echo "⚙️ Initializing GaiaNet node without CUDA..."
-    ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 fi
+
+add_gaianet_to_path
+
+echo "⚙️ Initializing GaiaNet node..."
+~/gaianet/bin/gaianet init --config "$config_url" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
