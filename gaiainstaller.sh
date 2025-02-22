@@ -163,6 +163,7 @@ fi'
 
 sleep 2
 screen -r gaiabot
+;;
 
         4)
         echo "Checking for active screen sessions..."
@@ -197,7 +198,6 @@ screen -r gaiabot
             echo "⚠️ No active screens found."
         fi
         ;;  # Correct placement of ';;'
-esac  # Ensure 'esac' closes the case statement
 
         5)
             echo "Restarting GaiaNet Node..."
