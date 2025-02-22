@@ -47,7 +47,7 @@ fi
 
 # Function to check if an NVIDIA GPU is present
 check_nvidia_gpu() {
-    if command -v nvidia-smi &> /dev/null || lspci | grep -i nvidia &> /dev/null; then
+    if command -v nvidia-smi &> /dev/null; then
         echo "✅ NVIDIA GPU detected."
         return 0
     else
