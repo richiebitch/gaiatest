@@ -80,12 +80,8 @@ install_cuda() {
         sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     fi
 
-    echo "🔄 Updating package lists..."
     sudo apt-get update
-
-    echo "📥 Installing CUDA Toolkit 12.8 (this may take a while)..."
-    sudo apt-get -y install cuda-toolkit
-
+    sudo apt-get -y install cuda-toolkit-12-8
     setup_cuda_env
 }
 
