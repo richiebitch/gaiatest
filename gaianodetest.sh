@@ -144,15 +144,6 @@ else
     config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
 fi
 
-# Determine correct config file based on system type and GPU presence
-if check_if_vps_or_laptop; then
-    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-elif check_nvidia_gpu; then
-    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-else
-    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-fi
-
 # Install GaiaNet once, only after determining correct configuration
 if check_nvidia_gpu; then
     setup_cuda_env
