@@ -56,26 +56,36 @@ check_nvidia_gpu() {
     fi
 }
 
-# Function to install CUDA Toolkit 12.8
+# Function to install CUDA Toolkit 12.8 with progress display
 install_cuda() {
+    echo "🔄 Installing CUDA Toolkit 12.8..."
+
     if $IS_WSL; then
         echo "🖥️ Installing CUDA for WSL 2..."
-        wget -q https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+        wget --progress=bar:force -O cuda-wsl-ubuntu.pin https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
         sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget -q https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
-        sudo dpkg -i cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
+
+        wget --progress=bar:force -O cuda-wsl.deb https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-wsl-ubuntu-12-8-local_12.8.0-1_amd64.deb
+        sudo dpkg -i cuda-wsl.deb
+
         sudo cp /var/cuda-repo-wsl-ubuntu-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     else
         echo "🖥️ Installing CUDA for Ubuntu 24.04..."
-        wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+        wget --progress=bar:force -O cuda-ubuntu2404.pin https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
         sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        wget -q https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-        sudo dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+
+        wget --progress=bar:force -O cuda-ubuntu.deb https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+        sudo dpkg -i cuda-ubuntu.deb
+
         sudo cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
     fi
 
+    echo "🔄 Updating package lists..."
     sudo apt-get update
+
+    echo "📥 Installing CUDA Toolkit 12.8 (this may take a while)..."
     sudo apt-get -y install cuda-toolkit-12-8
+
     setup_cuda_env
 }
 
@@ -84,11 +94,13 @@ setup_cuda_env() {
     echo "🔧 Setting up CUDA environment variables..."
     echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' >> ~/.bashrc
     echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
-    source ~/.bashrc
+    source ~/.bashrc  # ✅ Ensure the new paths are applied immediately
 }
 
 # Function to check CUDA version and install GaiaNet accordingly
 install_gaianet_with_cuda() {
+    source ~/.bashrc  # ✅ Load CUDA paths before checking `nvcc`
+    
     if command -v nvcc &> /dev/null; then
         CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)  
         echo "✅ CUDA version detected: $CUDA_VERSION"
@@ -106,7 +118,8 @@ install_gaianet_with_cuda() {
     else
         echo "⚠️ CUDA not found. Installing CUDA Toolkit 12.8..."
         install_cuda
-        install_gaianet_with_cuda  # Retry GaiaNet installation after installing CUDA
+        source ~/.bashrc  # ✅ Reload after installation
+        install_gaianet_with_cuda  # ✅ Retry after CUDA install
     fi
 }
 
