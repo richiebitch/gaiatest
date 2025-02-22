@@ -198,6 +198,7 @@ screen -r gaiabot
                 break  # Exit the loop if no screens are active
             fi
             ;;
+           esac
         5)
             echo "Restarting GaiaNet Node..."
             gaianet stop
