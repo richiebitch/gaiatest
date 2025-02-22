@@ -20,7 +20,7 @@ echo "==================================================="
 echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
 echo -e "\e[1;91m⚠️ Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
 echo -e "\e[1;94m☁️ VPS Requirements: Minimum 8 Core+ CPU & 6-8GB RAM - Higher is Better! ⚡\e[0m"
-echo -e "\e[1;92m💻 PC/Desktop/Laptop: GPU RTX 20/30/40/50 Series Supported! 🚀\e[0m"
+echo -e "\e[1;92m💻 PC/Desktop/Laptop: GPU RTX 20/30/40/50 Series Supported!🟢\e[0m"
 echo "==================================================="
 
 echo -e "\e[1;33m🖥️  Desktop GPU Users = Earn Higher Points – Desktop GPUs are 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
@@ -140,9 +140,15 @@ case $choice in
         ;;
 
     5)
-        echo "Terminating all 'gaiabot' screen sessions..."
-        screen -ls | awk '/[0-9]+\./ && /gaiabot/ {print $1}' | xargs -r screen -X -S kill
-        echo "✅ All 'gaiabot' screen sessions have been terminated."
+                echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
+                
+                # Find and kill all 'gaiabot' screen sessions
+                screen -ls | awk '/[0-9]+\./ && /gaiabot/ {print $1}' | xargs -r screen -X -S kill
+
+                # Wipe all 'gaiabot' screen session sockets
+                find /var/run/screen -type s -name "*gaiabot*" -exec rm -rf {} + 2>/dev/null
+
+                echo -e "\e[32m✅ All 'gaiabot' screen sessions have been terminated and wiped.\e[0m"
         ;;
 
     6)
