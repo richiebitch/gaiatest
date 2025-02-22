@@ -163,7 +163,7 @@ bash ~/$script_name
 
             sleep 2
             screen -r gaiabot
-            ;;
+
         4)
             echo "Checking for active screen sessions..."
             mapfile -t active_screens < <(screen -list | grep -o '[0-9]*\.[^ ]*')
