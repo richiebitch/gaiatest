@@ -150,6 +150,7 @@ if check_nvidia_gpu; then
     get_cuda_version  # ✅ Now check CUDA version
     install_gaianet
     add_gaianet_to_path
+    check_if_vps_or_laptop
     echo "⚙️ Initializing GaiaNet node with CUDA..."
     ~/gaianet/bin/gaianet init --config https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 else
