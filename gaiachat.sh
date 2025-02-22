@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Function to check if NVIDIA CUDA or GPU is present
 check_cuda() {
     if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
@@ -10,8 +8,8 @@ check_cuda() {
         read -r  # Waits for user input
 
         # Remove old script, download and execute new one
-        rm -rf GaiaNodeInstallet.sh 
-        curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/gaiainstaller.sh
+        rm -rf gaiainstaller.sh 
+        curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh
         chmod +x gaiainstaller.sh
         ./gaiainstaller.sh
 
@@ -209,7 +207,7 @@ if [ -z "$api_key" ]; then
 
         # Restart installer
         rm -rf gaiainstaller.sh
-        curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh
+        curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh
 
         exit 1
     else
