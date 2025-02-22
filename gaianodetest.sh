@@ -88,7 +88,7 @@ setup_cuda_env() {
 }
 
 # Function to check CUDA version and install GaiaNet accordingly
-get_cuda_version() {
+install_gaianet_with_cuda() {
     if command -v nvcc &> /dev/null; then
         CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)  
         echo "✅ CUDA version detected: $CUDA_VERSION"
@@ -106,6 +106,7 @@ get_cuda_version() {
     else
         echo "⚠️ CUDA not found. Installing CUDA Toolkit 12.8..."
         install_cuda
+        install_gaianet_with_cuda  # Retry GaiaNet installation after installing CUDA
     fi
 }
 
@@ -139,27 +140,23 @@ add_gaianet_to_path() {
 # Determine correct config file based on system type and GPU presence
 if check_if_vps_or_laptop; then
     config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+elif check_nvidia_gpu; then
+    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
 else
-    if check_nvidia_gpu; then
-        config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-    else
-        config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-    fi
+    config_url="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
 fi
 
-# Run checks and installations
-install_gaianet
-add_gaianet_to_path
-
+# Install GaiaNet once, only after determining correct configuration
 if check_nvidia_gpu; then
     setup_cuda_env
-    get_cuda_version
-    echo "⚙️ Initializing GaiaNet node with CUDA..."
+    install_gaianet_with_cuda
 else
-    echo "⚙️ Initializing GaiaNet node without CUDA..."
+    install_gaianet
 fi
 
-# Initialize GaiaNet with the correct config
+add_gaianet_to_path
+
+echo "⚙️ Initializing GaiaNet node..."
 ~/gaianet/bin/gaianet init --config "$config_url" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Start GaiaNet node
