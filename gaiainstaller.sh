@@ -176,3 +176,4 @@ case $choice in
 esac
 
 read -p "Press Enter to return to the main menu..."
+done
