@@ -24,7 +24,7 @@ while true; do
     echo -e "1) \e[1;36m 🎮 Install Gaianet For NVIDIA GPU (RTX 20/30/40/50 Series Support) \e[0m"
     echo -e "2) \e[1;36m 🖥️ Install Gaianet For VPS & Without NVIDIA GPU Computers \e[0m"
     echo -e "3) \e[1;94m 🤖 Chat with Gaia Domain Automatically \e[0m"
-    echo -e "4) \e[1;95m 🔍 Switch to GaiaChatBot Screen \e[0m"
+    echo -e "4) \e[1;95m 🔍 Switch to Active Screens \e[0m"
     echo "==================================================="
 
     echo -e "5) \e[1;33m 🔄 Restart GaiaNet Node \e[0m"
@@ -61,7 +61,6 @@ while true; do
             ./gaianodetest.sh
             ;;
 
-        3)
         3)
             echo "Detecting system configuration..."
 
