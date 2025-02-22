@@ -62,30 +62,65 @@ while true; do
         3)
             echo "Detecting system configuration..."
 
-            # Check if GaiaNet is installed
-            if ! command -v gaianet &> /dev/null; then
-                echo "❌ GaiaNet is not installed. Please install it first."
-                exit 1
-            else
-                gaianet_info=$(gaianet info 2>/dev/null)
-                if [[ -z "$gaianet_info" || "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-                    echo "✅ GaiaNet is already installed. Proceeding with chatbot setup."
-                    
-                    # Check if NVIDIA GPU is present
-                    if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-                        echo "✅ NVIDIA GPU detected. Running GPU-optimized Domain Chat..."
-                        script_name="gaiabotga1.sh"
-                    else
-                        echo "⚠️ No GPU detected. Running Non-GPU Domain Chat..."
-                        script_name="gaiabotga.sh"
-                    fi
-                else
-                    echo "❌ GaiaNet is not installed properly. Please check your installation."
-                    exit 1
-                fi
-            fi
+            #!/bin/bash
 
-            rm -rf ~/$script_name
+# Function to check if the system is a VPS or Laptop
+check_if_vps_or_laptop() {
+    vps_type=$(systemd-detect-virt)
+    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+        echo "✅ This is a VPS."
+        return 0  # VPS detected
+    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+        echo "✅ This is a Laptop."
+        return 0  # Laptop detected
+    else
+        echo "✅ This is a Desktop."
+        return 1  # Desktop detected
+    fi
+}
+
+# Check if GaiaNet is installed
+if ! command -v gaianet &> /dev/null; then
+    echo "❌ GaiaNet is not installed. Please install it first."
+    exit 1
+fi
+
+# Get GaiaNet info
+gaianet_info=$(gaianet info 2>/dev/null)
+
+# Validate GaiaNet installation
+if [[ -z "$gaianet_info" ]]; then
+    echo "❌ GaiaNet is not installed properly or not responding. Please check your installation."
+    exit 1
+elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+    echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
+else
+    echo "❌ GaiaNet is not installed properly. Please check your installation."
+    exit 1
+fi
+
+# Check if system is a VPS or Laptop
+if check_if_vps_or_laptop; then
+    script_name="gaiabotga.sh"
+    echo "🚀 Running VPS/Laptop version of Domain Chat..."
+else
+    # Check for GPU on Desktop
+    if command -v nvidia-smi &> /dev/null && nvidia-smi -L &> /dev/null; then
+        echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
+        script_name="gaiabotga1.sh"
+    else
+        echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
+        script_name="gaiabotga.sh"
+    fi
+fi
+
+# Remove old script if it exists and run the new one
+if [[ -f ~/$script_name ]]; then
+    rm -rf ~/$script_name
+fi
+
+# Execute the chosen script
+bash ~/$script_name
 
             # Check for existing GaiaBot screen sessions
             existing_screens=$(screen -ls | grep gaiabot | awk '{print $1}')
