@@ -60,8 +60,13 @@ while true; do
     clear
     echo "==============================================================="
     echo -e "\e[1;36m🚀🚀 GAIANET NODE INSTALLER Tool-Kit BY GA CRYPTO 🚀🚀\e[0m"
+
+    echo -e "\e[1;85m📢 Stay updated:\e[0m"
+    echo -e "\e[1;85m🔹 Telegram: https://t.me/GaCryptOfficial\e[0m"
+    echo -e "\e[1;85m🔹 X (Twitter): https://x.com/GACryptoO\e[0m"
+
     echo "==============================================================="
-    echo -e "\e[1;97m✨ Your GPU, CPU & RAM Specs Matter for Optimal Performance! ✨\e[0m"
+    echo -e "\e[1;97m✨ Your GPU, CPU & RAM Specs Matter a Lot for Optimal Performance! ✨\e[0m"
     echo "==============================================================="
     
     # Performance & Requirement Section
@@ -103,10 +108,6 @@ while true; do
     echo "==============================================================="
     
     read -p "Enter your choice: " choice
-    
-    echo -e "\e[1;97m📢 Stay updated:\e[0m"
-    echo -e "\e[1;97m🔹 Telegram: https://t.me/GaCryptOfficial\e[0m"
-    echo -e "\e[1;97m🔹 X (Twitter): https://x.com/GACryptoO\e[0m"
 
     case $choice in
         1)
