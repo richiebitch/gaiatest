@@ -142,7 +142,9 @@ add_gaianet_to_path() {
 # Main logic
 if check_nvidia_gpu; then
     echo "🖥️ NVIDIA GPU detected. Checking CUDA version..."
+    setup_cuda_env
     get_cuda_version
+    add_gaianet_to_path
 else
     echo "🖥️ No NVIDIA GPU detected. Installing GaiaNet without GPU support..."
     install_gaianet_no_gpu
