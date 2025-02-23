@@ -85,12 +85,12 @@ while true; do
             gaianet_info=$(gaianet info 2>/dev/null)
             if [[ -z "$gaianet_info" ]]; then
                 echo "❌ GaiaNet is not installed properly. Please check your installation."
-                exit 1
+                return 1
             elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
                 echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
             else
                 echo "❌ GaiaNet is not installed properly. Please check your installation."
-                exit 1
+                return 1
             fi
 
             check_if_vps_or_laptop() {
