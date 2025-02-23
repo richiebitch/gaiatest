@@ -122,8 +122,9 @@ get_cuda_version() {
             curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
         fi
     else
-        echo "⚠️ CUDA not found. Installing GaiaNet without GPU support..."
-        curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
+        echo "⚠️ CUDA not found. Installing CUDA first..."
+        install_cuda  # Call the install_cuda function to install CUDA
+        get_cuda_version  # Re-check CUDA version after installation
     fi
 }
 
