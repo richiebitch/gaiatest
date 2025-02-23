@@ -124,7 +124,6 @@ get_cuda_version() {
     else
         echo "⚠️ CUDA not found. Installing CUDA first..."
         install_cuda  # Call the install_cuda function to install CUDA
-        get_cuda_version  # Re-check CUDA version after installation
     fi
 }
 
