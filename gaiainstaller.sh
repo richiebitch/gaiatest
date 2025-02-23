@@ -123,24 +123,36 @@ while true; do
             ./gaianodetest.sh
             ;;
 
-        3)
+                3)
             echo "Detecting system configuration..."
 
             # Check if GaiaNet is installed
             if ! command -v gaianet &> /dev/null; then
-                echo "❌ GaiaNet is not installed. Please install it first."
+                echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it correctly.\e[0m"
+                echo -e "\e[1;33m🔗 Must check your GaiaNet Node active status on: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+                echo -e "\e[1;33m🔍 If already installed, verify by running: \e[1;32m'gaianet info'\e[0m"
+                read -p "Press Enter to return to the main menu..."
                 continue
             fi
 
             # Check if GaiaNet is installed properly
             gaianet_info=$(gaianet info 2>/dev/null)
             if [[ -z "$gaianet_info" ]]; then
-                echo "❌ GaiaNet is not installed properly. Please check your installation."
+                echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Please check your installation.\e[0m"
+                echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status."
+                echo -e "\e[1;33m🔍 Run: \e[1;32m'gaianet info'\e[0m to verify installation."
+                read -p "Press Enter to return to the main menu..."
                 continue
-            elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-                echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
+            fi
+
+            # Proceed if GaiaNet is properly installed
+            if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+                echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
             else
-                echo "❌ GaiaNet is not installed properly. Please check your installation."
+                echo -e "\e[1;31m❌ GaiaNet is installed but not functioning correctly. Please verify installation.\e[0m"
+                echo -e "\e[1;33m🔍 Run: \e[1;32m'gaianet info'\e[0m to confirm."
+                echo -e "\e[1;33m🔗 Check: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+                read -p "Press Enter to return to the main menu..."
                 continue
             fi
 
