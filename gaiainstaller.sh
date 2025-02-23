@@ -214,10 +214,12 @@ while true; do
             ;;
 
         6)
-            echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
-            screen -ls | awk '/[0-9]+\./ && /gaiabot/ {print $1}' | xargs -r screen -X -S kill
-            find /var/run/screen -type s -name "*gaiabot*" -exec rm -rf {} + 2>/dev/null
-            echo -e "\e[32m✅ All 'gaiabot' screen sessions have been terminated and wiped.\e[0m"
+           echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
+           # Terminate all 'gaiabot' screen sessions
+           screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
+           # Remove any remaining screen sockets for 'gaiabot'
+           find /var/run/screen -type s -name "*gaiabot*" -exec sudo rm -rf {} + 2>/dev/null
+           echo -e "\e[32m✅ All 'gaiabot' screen sessions have been terminated and wiped.\e[0m"
             ;;
 
         7)
