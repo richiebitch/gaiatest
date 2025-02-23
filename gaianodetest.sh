@@ -94,7 +94,13 @@ install_cuda() {
 
     sudo apt-get update
     sudo apt-get -y install cuda-toolkit-12-8
-    setup_cuda_env
+    if [ $? -eq 0 ]; then
+        echo "✅ CUDA installed successfully."
+        setup_cuda_env
+    else
+        echo "❌ CUDA installation failed."
+        return 1
+    fi
 }
 
 # Function to set up CUDA environment variables
@@ -108,7 +114,7 @@ setup_cuda_env() {
 # Function to check CUDA version and install GaiaNet accordingly
 get_cuda_version() {
     if command -v nvcc &> /dev/null; then
-        CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)  
+        CUDA_VERSION=$(nvcc --version | grep 'release' | awk '{print $6}' | cut -d',' -f1 | sed 's/V//g' | cut -d'.' -f1)
         echo "✅ CUDA version detected: $CUDA_VERSION"
 
         if [[ "$CUDA_VERSION" == "11" ]]; then
@@ -122,8 +128,8 @@ get_cuda_version() {
             curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
         fi
     else
-        echo "⚠️ CUDA not found. Installing CUDA first..."
-        install_cuda  # Call the install_cuda function to install CUDA
+        echo "⚠️ CUDA not found. Installing GaiaNet without GPU support..."
+        curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
     fi
 }
 
@@ -142,16 +148,25 @@ add_gaianet_to_path() {
 # Main logic
 if check_nvidia_gpu; then
     echo "🖥️ NVIDIA GPU detected. Checking CUDA version..."
-    setup_cuda_env
-    get_cuda_version
-    add_gaianet_to_path
+    if install_cuda; then
+        get_cuda_version
+    else
+        echo "❌ CUDA installation failed. Installing GaiaNet without GPU support..."
+        install_gaianet_no_gpu
+    fi
 else
     echo "🖥️ No NVIDIA GPU detected. Installing GaiaNet without GPU support..."
     install_gaianet_no_gpu
 fi
 
-# Add GaiaNet to PATH
-add_gaianet_to_path
+# Verify GaiaNet installation
+if [ -f ~/gaianet/bin/gaianet ]; then
+    echo "✅ GaiaNet installed successfully."
+    add_gaianet_to_path
+else
+    echo "❌ GaiaNet installation failed. Exiting."
+    exit 1
+fi
 
 # Determine system type and set configuration URL
 check_system_type
@@ -190,7 +205,6 @@ echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 
 # Closing message
-
 echo "==========================================================="
 echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
 echo "🌟 Stay connected: Telegram: https://t.me/GaCryptOfficial | Twitter: https://x.com/GACryptoO"
