@@ -33,14 +33,18 @@ RESET="\033[0m"
 
 # Ensure required packages are installed
 echo "📦 Installing dependencies..."
-sudo apt update -y && sudo apt install -y pciutils libgomp1 curl wget
-sudo apt update && sudo apt install -y build-essential libglvnd-dev pkg-config
+sudo apt update -y
+sudo apt install -y pciutils libgomp1 curl wget build-essential libglvnd-dev pkg-config
 
 # Detect if running inside WSL
 IS_WSL=false
 if grep -qi microsoft /proc/version; then
     IS_WSL=true
     echo "🖥️ Running inside WSL."
+    if [[ $(uname -r) != *WSL2* ]]; then
+        echo "⚠️ WSL 1 detected. CUDA is not supported on WSL 1. Please upgrade to WSL 2."
+        exit 1
+    fi
 else
     echo "🖥️ Running on a native Ubuntu system."
 fi
@@ -100,8 +104,10 @@ install_cuda() {
 # Function to set up CUDA environment variables
 setup_cuda_env() {
     echo "🔧 Setting up CUDA environment variables..."
-    echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' >> ~/.bashrc
-    echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
+    if ! grep -q "cuda-12.8" ~/.bashrc; then
+        echo 'export PATH=/usr/local/cuda-12.8/bin${PATH:+:${PATH}}' >> ~/.bashrc
+        echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
+    fi
     source ~/.bashrc
 }
 
@@ -123,7 +129,11 @@ get_cuda_version() {
         fi
     else
         echo "⚠️ CUDA not found. Installing CUDA first..."
-        install_cuda  # Call the install_cuda function to install CUDA
+        install_cuda
+        if ! command -v nvcc &> /dev/null; then
+            echo "❌ CUDA installation failed. Exiting..."
+            exit 1
+        fi
     fi
 }
 
@@ -135,8 +145,13 @@ install_gaianet_no_gpu() {
 
 # Function to add GaiaNet to PATH
 add_gaianet_to_path() {
-    echo 'export PATH=$HOME/gaianet/bin:$PATH' >> ~/.bashrc
-    source ~/.bashrc
+    if [[ -d "$HOME/gaianet/bin" ]]; then
+        echo 'export PATH=$HOME/gaianet/bin:$PATH' >> ~/.bashrc
+        source ~/.bashrc
+    else
+        echo "❌ GaiaNet binaries not found. Installation may have failed."
+        exit 1
+    fi
 }
 
 # Main logic
@@ -155,28 +170,15 @@ add_gaianet_to_path
 check_system_type
 SYSTEM_TYPE=$?  # Capture the return value of check_system_type
 
-if [[ $SYSTEM_TYPE -eq 0 ]]; then
-    # VPS
+if check_nvidia_gpu; then
+    CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+else
     CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-elif [[ $SYSTEM_TYPE -eq 1 ]]; then
-    # Laptop
-    if ! check_nvidia_gpu; then
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-    else
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-    fi
-elif [[ $SYSTEM_TYPE -eq 2 ]]; then
-    # Desktop
-    if ! check_nvidia_gpu; then
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-    else
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
-    fi
 fi
 
 # Initialize GaiaNet with the appropriate configuration
 echo "⚙️ Initializing GaiaNet..."
-~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed! Check logs for details."; exit 1; }
 
 # Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
@@ -187,7 +189,6 @@ echo "🚀 Starting GaiaNet node..."
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
 
-# Closing message
 echo "==========================================================="
 echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
 echo "🌟 Stay connected: Telegram: https://t.me/GaCryptOfficial | Twitter: https://x.com/GACryptoO"
