@@ -9,7 +9,7 @@ else
 fi
 
 # Function to list active screen sessions and allow user to select one
-function select_screen_session() {
+select_screen_session() {
     while true; do
         echo "Checking for active screen sessions..."
         
@@ -35,7 +35,7 @@ function select_screen_session() {
         
         # Prompt the user to select a session
         echo -n "Select a session by number (1, 2, 3, ...) or press Enter to return to the main menu: "
-        read choice
+        read -r choice
         
         # If the user presses Enter, return to the main menu
         if [ -z "$choice" ]; then
@@ -107,10 +107,10 @@ while true; do
     echo -e "0) \e[1;31m❌  Exit Installer\e[0m"
     echo "==============================================================="
     
-    read -p "Enter your choice: " choice
+    read -rp "Enter your choice: " choice
 
     case $choice in
-        1)
+        1|2|3)
             echo "Install Gaia-Node for VPS or Non-GPU Users..."
             rm -rf gaianodetest.sh
             curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaianodetest.sh
@@ -118,99 +118,84 @@ while true; do
             ./gaianodetest.sh
             ;;
        
-        2)
-            echo "Install Gaia-Node for Laptop Nvidia GPU Users..."
-            rm -rf gaianodetest.sh
-            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaianodetest.sh
-            chmod +x gaianodetest.sh
-            ./gaianodetest.sh
-            ;;
-
-        3)
-            echo "Install Gaia-Node for Desktop NVIDIA GPU Users..."
-            rm -rf gaianodetest.sh
-            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaianodetest.sh
-            chmod +x gaianodetest.sh
-            ./gaianodetest.sh
-            ;;
-
         4)
             echo "Detecting system configuration..."
 
             # Check if GaiaNet is installed
             if ! command -v gaianet &> /dev/null; then
-                echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it correctly.\e[0m"
-                echo -e "\e[1;33m🔗 Must check your GaiaNet Node active status on: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-                echo -e "\e[1;33m🔍 If already installed, verify by running: \e[1;32m'gaianet info'\e[0m"
-                read -p "Press Enter to return to the main menu..."
+                echo -e "\e[1;31m❌ GaiaNet is not installed or not found. Please install it first.\e[0m"
+                echo -e "\e[1;33m🔍 If already installed, go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
+                read -rp "Press Enter to return to the main menu..."
                 continue
             fi
 
             # Check if GaiaNet is installed properly
             gaianet_info=$(gaianet info 2>/dev/null)
             if [[ -z "$gaianet_info" ]]; then
-                echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Please check your installation.\e[0m"
-                echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status."
-                echo -e "\e[1;33m🔍 Run: \e[1;32m'gaianet info'\e[0m to verify installation."
-                read -p "Press Enter to return to the main menu..."
+                echo -e "\e[1;31m❌ GaiaNet is installed but not configured properly. Uninstall & Re-install Again.\e[0m"
+                echo -e "\e[1;33m🔗 Visit: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m to check the node status Must be Green."
+                echo -e "\e[1;33m🔍 Run: \e[1;33m'go back & press 9 to check: \e[1;32m'Node & Device Id'\e[0m"
+                read -rp "Press Enter to return to the main menu..."
                 continue
             fi
 
             # Proceed if GaiaNet is properly installed
-if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-    echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
+            if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+                echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
 
-    # Check if port 8080 is active using lsof
-    if sudo lsof -i :8080 > /dev/null 2>&1; then
-        echo -e "\e[1;32m✅ GaiaNode is active. GaiaNet node is running.\e[0m"
-    else
-        echo -e "\e[1;31m❌ GaiaNode is not running.\e[0m"
-        echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-        echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-        read -p "Press Enter to return to the main menu..."
-        continue
-    fi
-            # Function to check if the system is a VPS, laptop, or desktop
-            check_if_vps_or_laptop() {
-                vps_type=$(systemd-detect-virt)
-                if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-                    echo "✅ This is a VPS."
-                    return 0
-                elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-                    echo "✅ This is a Laptop."
-                    return 0
+                # Check if port 8080 is active using lsof
+                if sudo lsof -i :8080 > /dev/null 2>&1; then
+                    echo -e "\e[1;32m✅ GaiaNode is active. GaiaNet node is running.\e[0m"
                 else
-                    echo "✅ This is a Desktop."
-                    return 1
+                    echo -e "\e[1;31m❌ GaiaNode is not running.\e[0m"
+                    echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+                    echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
+                    read -rp "Press Enter to return to the main menu..."
+                    continue
                 fi
-            }
 
-            # Determine the appropriate script based on system type
-            if check_if_vps_or_laptop; then
-                script_name="gaiachat.sh"
-            else
-                if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-                    echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
+                # Function to check if the system is a VPS, laptop, or desktop
+                check_if_vps_or_laptop() {
+                    vps_type=$(systemd-detect-virt)
+                    if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+                        echo "✅ This is a VPS."
+                        return 0
+                    elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+                        echo "✅ This is a Laptop."
+                        return 0
+                    else
+                        echo "✅ This is a Desktop."
+                        return 1
+                    fi
+                }
+
+                # Determine the appropriate script based on system type
+                if check_if_vps_or_laptop; then
                     script_name="gaiachat.sh"
                 else
-                    echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-                    script_name="gaiachat.sh"
+                    if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
+                        echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
+                        script_name="gaiachat.sh"
+                    else
+                        echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
+                        script_name="gaiachat.sh"
+                    fi
                 fi
+
+                # Start the chatbot in a detached screen session
+                screen -dmS gaiabot bash -c '
+                curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
+                if [ -f "'"$script_name"'" ]; then
+                    ./'"$script_name"'
+                    exec bash
+                else
+                    echo "❌ Error: Failed to download '"$script_name"'"
+                    sleep 10
+                fi'
+
+                sleep 2
+                screen -r gaiabot
             fi
-
-            # Start the chatbot in a detached screen session
-            screen -dmS gaiabot bash -c '
-            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
-            if [ -f "'"$script_name"'" ]; then
-                ./'"$script_name"'
-                exec bash
-            else
-                echo "❌ Error: Failed to download '"$script_name"'"
-                sleep 10
-            fi'
-
-            sleep 2
-            screen -r gaiabot
             ;;
 
         5)
@@ -218,12 +203,12 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
             ;;
 
         6)
-           echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
-           # Terminate all 'gaiabot' screen sessions
-           screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
-           # Remove any remaining screen sockets for 'gaiabot'
-           find /var/run/screen -type s -name "*gaiabot*" -exec sudo rm -rf {} + 2>/dev/null
-           echo -e "\e[32m✅ All 'gaiabot' screen sessions have been killed and wiped.\e[0m"
+            echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
+            # Terminate all 'gaiabot' screen sessions
+            screen -ls | awk '/[0-9]+\.gaiabot/ {print $1}' | xargs -r -I{} screen -X -S {} quit
+            # Remove any remaining screen sockets for 'gaiabot'
+            find /var/run/screen -type s -name "*gaiabot*" -exec sudo rm -rf {} + 2>/dev/null
+            echo -e "\e[32m✅ All 'gaiabot' screen sessions have been killed and wiped.\e[0m"
             ;;
 
         7)
@@ -251,7 +236,7 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
 
         10)
             echo "⚠️ WARNING: This will completely remove GaiaNet Node from your system!"
-            read -p "Are you sure you want to proceed? (y/n) " confirm
+            read -rp "Are you sure you want to proceed? (y/n) " confirm
             if [[ "$confirm" == "y" ]]; then
                 echo "🗑️ Uninstalling GaiaNet Node..."
                 curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/uninstall.sh' | bash
@@ -271,5 +256,5 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
             ;;
     esac
 
-    read -p "Press Enter to return to the main menu..."
+    read -rp "Press Enter to return to the main menu..."
 done
