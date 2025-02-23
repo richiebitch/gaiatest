@@ -153,17 +153,26 @@ add_gaianet_to_path
 
 # Determine system type and set configuration URL
 check_system_type
-case $? in
-    0)  # VPS
+SYSTEM_TYPE=$?  # Capture the return value of check_system_type
+
+if [[ $SYSTEM_TYPE -eq 0 ]]; then
+    # VPS
+    CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+elif [[ $SYSTEM_TYPE -eq 1 ]]; then
+    # Laptop
+    if ! check_nvidia_gpu; then
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-        ;;
-    1)  # Laptop
-        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-        ;;
-    2)  # Desktop
+    else
         CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-        ;;
-esac
+    fi
+elif [[ $SYSTEM_TYPE -eq 2 ]]; then
+    # Desktop
+    if ! check_nvidia_gpu; then
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+    else
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config3.json"
+    fi
+fi
 
 # Initialize GaiaNet with the appropriate configuration
 echo "⚙️ Initializing GaiaNet..."
@@ -177,6 +186,7 @@ echo "🚀 Starting GaiaNet node..."
 # Fetch GaiaNet node information
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
+
 # Closing message
 echo "==========================================================="
 echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
