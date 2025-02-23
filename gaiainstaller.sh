@@ -165,8 +165,8 @@ if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; the
         echo -e "\e[1;32m✅ GaiaNode is active. GaiaNet node is running.\e[0m"
     else
         echo -e "\e[1;31m❌ GaiaNode is not running.\e[0m"
-        echo -e "\e[1;33m🔍 Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
-        echo -e "\e[1;33m🔗 Check: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+        echo -e "\e[1;33m🔗 Check Node Status Green Or Red: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+        echo -e "\e[1;33m🔍 If Red, Please Back to Main Menu & Restart your GaiaNet node first.\e[0m"
         read -p "Press Enter to return to the main menu..."
         continue
     fi
