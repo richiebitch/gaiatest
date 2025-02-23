@@ -245,8 +245,8 @@ while true; do
 
         10)
             echo "⚠️ WARNING: This will completely remove GaiaNet Node from your system!"
-            read -p "Are you sure you want to proceed? (yes/no) " confirm
-            if [[ "$confirm" == "yes" ]]; then
+            read -p "Are you sure you want to proceed? (y/n) " confirm
+            if [[ "$confirm" == "y" ]]; then
                 echo "🗑️ Uninstalling GaiaNet Node..."
                 curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/uninstall.sh' | bash
                 source /root/.bashrc
