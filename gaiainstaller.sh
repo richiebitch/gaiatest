@@ -58,54 +58,55 @@ function select_screen_session() {
 
 while true; do
     clear
-    echo "==================================================="
-    echo -e "\e[5;1;36m 🚀🚀 GAIANET NODE INSTALLER Tool-Kit BY GA CRYPTO 🚀🚀 \e[0m"
-    echo "==================================================="
+    echo "==============================================================="
+    echo -e "\e[1;36m🚀🚀 GAIANET NODE INSTALLER Tool-Kit BY GA CRYPTO 🚀🚀\e[0m"
+    echo "==============================================================="
     echo -e "\e[1;97m✨ Your GPU, CPU & RAM Specs Matter for Optimal Performance! ✨\e[0m"
-    echo "==================================================="
-
-    # Stylish Performance & Requirement Section
+    echo "==============================================================="
+    
+    # Performance & Requirement Section
     echo -e "\e[1;96m⏱  Keep Your Node Active Minimum 15 - 20 Hours Each Day! ⏳\e[0m"
-    echo -e "\e[1;91m⚠️ Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
-    echo -e "\e[1;94m☁️ VPS Requirements: Minimum 8 Core+ CPU & 6-8GB RAM - Higher is Better! ⚡\e[0m"
-    echo -e "\e[1;92m💻 PC/Desktop/Laptop: GPU RTX 20/30/40/50 Series Supported!🟢\e[0m"
-    echo "==================================================="
-
-    echo -e "\e[1;33m🖥️  Desktop GPU Users = Earn Higher Points – Desktop GPUs are 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
-    echo -e "\e[1;33m💻  Laptop GPU Users = Earn More Points Than Non-GPU Users 🚀💸\e[0m"
-    echo -e "\e[1;33m☁️  VPS/Non-GPU Users = Earn Good Points Based on VPS Specifications ⚙️📊\e[0m"
-    echo "==================================================="
+    echo -e "\e[1;91m⚠️  Don’t Run Multiple Nodes if You Only Have 6-8GB RAM! ❌\e[0m"
+    echo -e "\e[1;94m☁️  VPS Requirements: 8 Core+ CPU & 6-8GB RAM (Higher is Better) ⚡\e[0m"
+    echo -e "\e[1;92m💻  Supported GPUs: RTX 20/30/40/50 Series Or Higher 🟢\e[0m"
+    echo "==============================================================="
+    
+    echo -e "\e[1;33m🖥️  Desktop GPU Users: Higher Points – 10x More Powerful than Laptop GPUs! ⚡🔥\e[0m"
+    echo -e "\e[1;33m💻  Laptop GPU Users: Earn More Points Than Non-GPU Users 🚀💸\e[0m"
+    echo -e "\e[1;33m🌐  VPS/Non-GPU Users: Earn Based on VPS Specifications ⚙️📊\e[0m"
+    echo "==============================================================="
     echo -e "\e[1;32m✅ Earn Gaia Points Continuously – Keep Your System Active for Maximum Rewards! 💰💰\e[0m"
-    echo "==================================================="
-
-    echo -e "\n\e[1mPress a number to perform an action:\e[0m\n"
-    echo -e "1) \e[1;36m ☁️ Install Gaia-Node for VPS or Non-GPU Users \e[0m"
-    echo -e "2) \e[1;36m 🖥️ Install Gaia-Node for Laptop Nvidia GPU Users \e[0m"
-    echo -e "3) \e[1;36m 🎮 Install Gaia-Node for Desktop NVIDIA GPU Users \e[0m"
-    echo -e "4) \e[1;94m 🤖 Chat With Domain Automatically \e[0m"
-    echo -e "5) \e[1;95m 🔍 Switch to Active Screens \e[0m"
-    echo -e "6) \e[1;31m 🚨 Terminate All Active GaiaNet Screens \e[0m"
-    echo "==================================================="
-
-    echo -e "7) \e[1;33m 🔄 Restart GaiaNet Node \e[0m"
-    echo -e "8) \e[1;33m ⏹️ Stop GaiaNet Node \e[0m"
-    echo "==================================================="
-
-    echo -e "9) \e[1;36m 🔍 Check Your Gaia Node ID & Device ID \e[0m"
-    echo "==================================================="
-
+    echo "==============================================================="
+    
+    # Menu Options
+    echo -e "\n\e[1mSelect an action:\e[0m\n"
+    echo -e "1) \e[1;36m☁️  Install Gaia-Node (VPS/Non-GPU)\e[0m"
+    echo -e "2) \e[1;36m💻  Install Gaia-Node (Laptop Nvidia GPU)\e[0m"
+    echo -e "3) \e[1;36m🎮  Install Gaia-Node (Desktop NVIDIA GPU)\e[0m"
+    echo -e "4) \e[1;94m🤖  Chat With Domain Automatically\e[0m"
+    echo -e "5) \e[1;95m🔍  Switch to Active Screens\e[0m"
+    echo -e "6) \e[1;31m🚨  Terminate All Active GaiaNet Screens\e[0m"
+    echo "==============================================================="
+    
+    echo -e "7) \e[1;33m🔄  Restart GaiaNet Node\e[0m"
+    echo -e "8) \e[1;33m⏹️  Stop GaiaNet Node\e[0m"
+    echo "==============================================================="
+    
+    echo -e "9) \e[1;36m🔍  Check Your Gaia Node ID & Device ID\e[0m"
+    echo "==============================================================="
+    
     echo -e "\e[1;31m⚠️  DANGER ZONE:\e[0m"
-    echo -e "10) \e[1;31m 🗑️ Uninstall GaiaNet Node (Risky Operation) \e[0m"
-    echo "==================================================="
-
-    echo -e "0) \e[1;31m ❌ Exit Installer \e[0m"
-    echo "==================================================="
-
+    echo -e "10) \e[1;31m🗑️  Uninstall GaiaNet Node (Risky Operation)\e[0m"
+    echo "==============================================================="
+    
+    echo -e "0) \e[1;31m❌  Exit Installer\e[0m"
+    echo "==============================================================="
+    
     read -p "Enter your choice: " choice
-
-    echo -e "\e[1;97m 📢 Stay updated: \e[0m"
-    echo -e "\e[1;97m Follow us on Telegram: https://t.me/GaCryptOfficial \e[0m"
-    echo -e "\e[1;97m Follow us on X: https://x.com/GACryptoO \e[0m"
+    
+    echo -e "\e[1;97m📢 Stay updated:\e[0m"
+    echo -e "\e[1;97m🔹 Telegram: https://t.me/GaCryptOfficial\e[0m"
+    echo -e "\e[1;97m🔹 X (Twitter): https://x.com/GACryptoO\e[0m"
 
     case $choice in
         1)
