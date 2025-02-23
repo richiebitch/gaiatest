@@ -51,7 +51,7 @@ function select_screen_session() {
         # Attach to the selected session
         selected_session=${session_map[$choice]}
         echo "Attaching to session: $selected_session"
-        screen -r "$selected_session"
+        screen -d -r "$selected_session"
         break
     done
 }
