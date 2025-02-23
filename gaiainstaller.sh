@@ -157,15 +157,26 @@ while true; do
             fi
 
             # Proceed if GaiaNet is properly installed
-            if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-                echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
-            else
-                echo -e "\e[1;31m❌ GaiaNet is installed but not functioning correctly. Please verify installation.\e[0m"
-                echo -e "\e[1;33m🔍 Run: \e[1;32m'gaianet info'\e[0m to confirm."
-                echo -e "\e[1;33m🔗 Check: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
-                read -p "Press Enter to return to the main menu..."
-                continue
-            fi
+if [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+    echo -e "\e[1;32m✅ GaiaNet is installed and detected. Proceeding with chatbot setup.\e[0m"
+
+    # Check if port 8080 is active using lsof
+    if sudo lsof -i :8080 > /dev/null 2>&1; then
+        echo -e "\e[1;32m✅ GaiaNode is active. GaiaNet node is running.\e[0m"
+    else
+        echo -e "\e[1;31m❌ GaiaNode is not running. Please start your GaiaNode first.\e[0m"
+        echo -e "\e[1;33m🔍 Please start your GaiaNet node first.\e[0m"
+        echo -e "\e[1;33m🔗 Check: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+        read -p "Press Enter to return to the main menu..."
+        continue
+    fi
+else
+    echo -e "\e[1;31m❌ GaiaNet is installed but not functioning correctly. Please verify installation.\e[0m"
+    echo -e "\e[1;33m🔍 Run: \e[1;32m'gaianet info'\e[0m to confirm."
+    echo -e "\e[1;33m🔗 Check: \e[1;34mhttps://www.gaianet.ai/setting/nodes\e[0m"
+    read -p "Press Enter to return to the main menu..."
+    continue
+fi
 
             # Function to check if the system is a VPS, laptop, or desktop
             check_if_vps_or_laptop() {
