@@ -76,64 +76,71 @@ while true; do
             ;;
 
         3)
-echo "Detecting system configuration..."
-if ! command -v gaianet &> /dev/null; then
-    echo "❌ GaiaNet is not installed. Please install it first."
-    main_menu
-    return 0
-fi
+    echo "Detecting system configuration..."
 
-gaianet_info=$(gaianet info 2>/dev/null)
-if [[ -z "$gaianet_info" ]]; then
-    echo "❌ GaiaNet is not installed properly. Please check your installation."
-    main_menu
-    exit 0
-elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-    echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
-else
-    echo "❌ GaiaNet is not installed properly. Please check your installation."
-    main_menu
-    exit 0
-fi
-            check_if_vps_or_laptop() {
-                vps_type=$(systemd-detect-virt)
-                if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
-                    echo "✅ This is a VPS."
-                    return 0
-                elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
-                    echo "✅ This is a Laptop."
-                    return 0
-                else
-                    echo "✅ This is a Desktop."
-                    return 1
-                fi
-            }
+    # Check if GaiaNet is installed
+    if ! command -v gaianet &> /dev/null; then
+        echo "❌ GaiaNet is not installed. Please install it first."
+        main_menu
+        return 0
+    fi
 
-            if check_if_vps_or_laptop; then
-                script_name="gaiachat.sh"
-            else
-                if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
-                    echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
-                    script_name="gaiachat1.sh"
-                else
-                    echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
-                    script_name="gaiachat.sh"
-                fi
-            fi
+    # Check if GaiaNet is installed properly
+    gaianet_info=$(gaianet info 2>/dev/null)
+    if [[ -z "$gaianet_info" ]]; then
+        echo "❌ GaiaNet is not installed properly. Please check your installation."
+        main_menu
+        return 0
+    elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+        echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
+    else
+        echo "❌ GaiaNet is not installed properly. Please check your installation."
+        main_menu
+        return 0
+    fi
 
-            screen -dmS gaiabot bash -c '
-            curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
-            if [ -f "'"$script_name"'" ]; then
-                ./'"$script_name"'
-                exec bash
-            else
-                echo "❌ Error: Failed to download '"$script_name"'"
-                sleep 10
-            fi'
+    # Function to check if the system is a VPS, laptop, or desktop
+    check_if_vps_or_laptop() {
+        vps_type=$(systemd-detect-virt)
+        if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
+            echo "✅ This is a VPS."
+            return 0
+        elif ls /sys/class/power_supply/ | grep -q "^BAT[0-9]"; then
+            echo "✅ This is a Laptop."
+            return 0
+        else
+            echo "✅ This is a Desktop."
+            return 1
+        fi
+    }
 
-            sleep 2
-            screen -r gaiabot
-            ;;
+    # Determine the appropriate script based on system type
+    if check_if_vps_or_laptop; then
+        script_name="gaiachat.sh"
+    else
+        if command -v nvcc &> /dev/null || command -v nvidia-smi &> /dev/null; then
+            echo "✅ NVIDIA GPU detected on Desktop. Running GPU-optimized Domain Chat..."
+            script_name="gaiachat1.sh"
+        else
+            echo "⚠️ No GPU detected on Desktop. Running Non-GPU version..."
+            script_name="gaiachat.sh"
+        fi
+    fi
+
+    # Start the chatbot in a detached screen session
+    screen -dmS gaiabot bash -c '
+    curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/'"$script_name"' && chmod +x '"$script_name"';
+    if [ -f "'"$script_name"'" ]; then
+        ./'"$script_name"'
+        exec bash
+    else
+        echo "❌ Error: Failed to download '"$script_name"'"
+        sleep 10
+    fi'
+
+    sleep 2
+    screen -r gaiabot
+    ;;
 
         4)
             select_screen_session
