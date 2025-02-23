@@ -79,7 +79,7 @@ while true; do
             echo "Detecting system configuration..."
             if ! command -v gaianet &> /dev/null; then
                 echo "❌ GaiaNet is not installed. Please install it first."
-                exit 1
+                return 1
             fi
 
             gaianet_info=$(gaianet info 2>/dev/null)
