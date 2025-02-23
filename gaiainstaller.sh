@@ -135,9 +135,64 @@ case $choice in
         ;;
 
     4)
+function main_menu() {
+    echo "Returning to the main menu..."
+    rm -rf ~/gaiainstaller.sh
+    curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh
+}
+
+# Function to list active screen sessions and allow user to select one
+function select_screen_session() {
+    while true; do
         echo "Checking for active screen sessions..."
-        screen -list
-        ;;
+        
+        # Get the list of active screen sessions
+        sessions=$(screen -list | grep -oP '\d+\.\S+' | awk '{print $1}')
+        
+        # Check if there are any active sessions
+        if [ -z "$sessions" ]; then
+            echo "No active screen sessions found."
+            main_menu
+            break
+        fi
+        
+        # Display the list of sessions with numbers
+        echo "Active screen sessions:"
+        i=1
+        declare -A session_map
+        for session in $sessions; do
+            session_name=$(echo "$session" | cut -d'.' -f2)
+            echo "$i) $session_name"
+            session_map[$i]=$session
+            i=$((i+1))
+        done
+        
+        # Prompt the user to select a session
+        echo -n "Select a session by number (1, 2, 3, ...) or press Enter to return to the main menu: "
+        read choice
+        
+        # If the user presses Enter, return to the main menu
+        if [ -z "$choice" ]; then
+            main_menu
+            break
+        fi
+        
+        # Validate the user's choice
+        if [[ -z "${session_map[$choice]}" ]]; then
+            echo "Invalid selection. Please try again."
+            continue
+        fi
+        
+        # Attach to the selected session
+        selected_session=${session_map[$choice]}
+        echo "Attaching to session: $selected_session"
+        screen -r "$selected_session"
+        break
+    done
+}
+
+# Call the function
+select_screen_session
 
     5)
                 echo "🔴 Terminating and wiping all 'gaiabot' screen sessions..."
