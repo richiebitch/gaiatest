@@ -33,7 +33,7 @@ while true; do
     echo -e "\n\e[1mPress a number to perform an action:\e[0m\n"
     echo -e "1) \e[1;36m 🎮 Install Gaia-Node for Desktop NVIDIA GPU Users \e[0m"
     echo -e "2) \e[1;36m 🖥️ Install Gaia-Node for VPS & Laptop Nvidia GPU Users \e[0m"
-    echo -e "3) \e[1;94m 🤖 Detect System Configuration & Setup Chatbot \e[0m"
+    echo -e "3) \e[1;94m 🤖 Chain With Domain AUtomaticall \e[0m"
     echo -e "4) \e[1;95m 🔍 Switch to Active Screens \e[0m"
     echo -e "5) \e[1;31m 🚨 Terminate All Active GaiaNet Screens \e[0m"
     echo "==================================================="
