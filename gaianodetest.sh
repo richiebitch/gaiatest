@@ -118,18 +118,18 @@ get_cuda_version() {
             echo "🔧 Installing GaiaNet with ggmlcuda 12..."
             curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash -s -- --ggmlcuda 12
         else
-            echo "⚠️ Unsupported CUDA version detected. Exiting..."
-            exit 1
+            echo "⚠️ Unsupported CUDA version detected. Installing GaiaNet without GPU support..."
+            curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
         fi
     else
-        echo "⚠️ CUDA not found. Installing CUDA Toolkit 12.8..."
-        install_cuda
+        echo "⚠️ CUDA not found. Installing GaiaNet without GPU support..."
+        curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
     fi
 }
 
-# Function to install GaiaNet
-install_gaianet() {
-    echo "📥 Installing GaiaNet node..."
+# Function to install GaiaNet without GPU support
+install_gaianet_no_gpu() {
+    echo "📥 Installing GaiaNet without GPU support..."
     curl -sSfL 'https://github.com/GaiaNet-AI/gaianet-node/releases/latest/download/install.sh' | bash
 }
 
@@ -139,59 +139,44 @@ add_gaianet_to_path() {
     source ~/.bashrc
 }
 
-# Run checks and installations
+# Main logic
 if check_nvidia_gpu; then
-    setup_cuda_env  # ✅ Set up CUDA environment first
-    get_cuda_version  # ✅ Now check CUDA version
-    install_gaianet
-    add_gaianet_to_path
-
-    # Determine system type and set configuration URL
-    check_system_type
-    case $? in
-        0)  # VPS
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-            ;;
-        1)  # Laptop
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-            ;;
-        2)  # Desktop
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
-            ;;
-    esac
-
-    echo "⚙️ Initializing GaiaNet node with CUDA..."
-    ~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    echo "🖥️ NVIDIA GPU detected. Checking CUDA version..."
+    get_cuda_version
 else
-    install_gaianet
-    add_gaianet_to_path
-
-    # Determine system type and set configuration URL
-    check_system_type
-    case $? in
-        0)  # VPS
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-            ;;
-        1)  # Laptop
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-            ;;
-        2)  # Desktop
-            CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
-            ;;
-    esac
-
-    echo "⚙️ Initializing GaiaNet node without CUDA..."
-    ~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
+    echo "🖥️ No NVIDIA GPU detected. Installing GaiaNet without GPU support..."
+    install_gaianet_no_gpu
 fi
+
+# Add GaiaNet to PATH
+add_gaianet_to_path
+
+# Determine system type and set configuration URL
+check_system_type
+case $? in
+    0)  # VPS
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+        ;;
+    1)  # Laptop
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config2.json"
+        ;;
+    2)  # Desktop
+        CONFIG_URL="https://raw.githubusercontent.com/abhiag/Gaia_Node/main/config1.json"
+        ;;
+esac
+
+# Initialize GaiaNet with the appropriate configuration
+echo "⚙️ Initializing GaiaNet..."
+~/gaianet/bin/gaianet init --config "$CONFIG_URL" || { echo "❌ GaiaNet initialization failed!"; exit 1; }
 
 # Start GaiaNet node
 echo "🚀 Starting GaiaNet node..."
 ~/gaianet/bin/gaianet config --domain gaia.domains
 ~/gaianet/bin/gaianet start || { echo "❌ Error: Failed to start GaiaNet node!"; exit 1; }
 
+# Fetch GaiaNet node information
 echo "🔍 Fetching GaiaNet node information..."
 ~/gaianet/bin/gaianet info || { echo "❌ Error: Failed to fetch GaiaNet node information!"; exit 1; }
-
 # Closing message
 echo "==========================================================="
 echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
