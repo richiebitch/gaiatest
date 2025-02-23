@@ -8,38 +8,6 @@ else
     echo "✅ Screen is already installed."
 fi
 
-main_menu() {
-    echo "Returning to the main menu..."
-    rm -rf ~/gaiainstaller.sh
-    curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh
-}
-
-select_screen_session() {
-    while true; do
-        echo "Checking for active screen sessions..."
-        sessions=$(screen -list | grep -oP '\d+\.\S+')
-        
-        if [ -z "$sessions" ]; then
-            echo "No active screen sessions found."
-            main_menu
-            break
-        fi
-
-        echo "Active screen sessions:"
-        select session in $sessions; do
-            if [ -z "$session" ]; then
-                main_menu
-                break
-            else
-                echo "Attaching to session: $session"
-                screen -r "$session"
-                break
-            fi
-        done
-        break
-    done
-}
-
 while true; do
     clear
     echo "==================================================="
@@ -64,7 +32,7 @@ while true; do
 
     echo -e "\n\e[1mPress a number to perform an action:\e[0m\n"
     echo -e "1) \e[1;36m 🎮 Install Gaia-Node for Desktop NVIDIA GPU Users \e[0m"
-    echo -e "2) \e[1;36m 🖥️ Install Gaia-Node for VPS & Laptop Users \e[0m"
+    echo -e "2) \e[1;36m 🖥️ Install Gaia-Node for VPS & Laptop Nvidia GPU Users \e[0m"
     echo -e "3) \e[1;94m 🤖 Detect System Configuration & Setup Chatbot \e[0m"
     echo -e "4) \e[1;95m 🔍 Switch to Active Screens \e[0m"
     echo -e "5) \e[1;31m 🚨 Terminate All Active GaiaNet Screens \e[0m"
@@ -92,7 +60,7 @@ while true; do
 
     case $choice in
         1)
-            echo "Installing GaiaNet with NVIDIA GPU support..."
+            echo "Install Gaia-Node for Desktop NVIDIA GPU Users..."
             rm -rf gaianodetest.sh
             curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaianodetest.sh
             chmod +x gaianodetest.sh
@@ -100,7 +68,7 @@ while true; do
             ;;
 
         2)
-            echo "Installing GaiaNet without GPU support..."
+            echo "Install Gaia-Node for VPS & Laptop GPU Users..."
             rm -rf gaianodetest.sh
             curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaianodetest.sh
             chmod +x gaianodetest.sh
@@ -222,3 +190,60 @@ while true; do
 
     read -p "Press Enter to return to the main menu..."
 done
+
+# Main menu function
+function main_menu() {
+    echo "Returning to the main menu..."
+    rm -rf ~/gaiainstaller.sh
+    curl -O https://raw.githubusercontent.com/abhiag/Gaiatest/main/gaiainstaller.sh && chmod +x gaiainstaller.sh && ./gaiainstaller.sh
+}
+
+# Function to list active screen sessions and allow user to select one
+function select_screen_session() {
+    while true; do
+        echo "Checking for active screen sessions..."
+        
+        # Get the list of active screen sessions
+        sessions=$(screen -list | grep -oP '\d+\.\S+' | awk '{print $1}')
+        
+        # Check if there are any active sessions
+        if [ -z "$sessions" ]; then
+            echo "No active screen sessions found."
+            main_menu
+            break
+        fi
+        
+        # Display the list of sessions with numbers
+        echo "Active screen sessions:"
+        i=1
+        declare -A session_map
+        for session in $sessions; do
+            session_name=$(echo "$session" | cut -d'.' -f2)
+            echo "$i) $session_name"
+            session_map[$i]=$session
+            i=$((i+1))
+        done
+        
+        # Prompt the user to select a session
+        echo -n "Select a session by number (1, 2, 3, ...) or press Enter to return to the main menu: "
+        read choice
+        
+        # If the user presses Enter, return to the main menu
+        if [ -z "$choice" ]; then
+            main_menu
+            break
+        fi
+        
+        # Validate the user's choice
+        if [[ -z "${session_map[$choice]}" ]]; then
+            echo "Invalid selection. Please try again."
+            continue
+        fi
+        
+        # Attach to the selected session
+        selected_session=${session_map[$choice]}
+        echo "Attaching to session: $selected_session"
+        screen -r "$selected_session"
+        break
+    done
+}
