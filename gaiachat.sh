@@ -58,7 +58,7 @@ set_api_url() {
         fi
     fi
 
-    echo "🔗 Using API URL: $API_URL ($API_NAME)"
+    echo "🔗 Using API URL: ($API_NAME)"
 }
 
 # Set the API URL based on system type and CUDA presence
