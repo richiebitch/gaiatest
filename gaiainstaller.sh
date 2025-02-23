@@ -76,23 +76,25 @@ while true; do
             ;;
 
         3)
-            echo "Detecting system configuration..."
-            if ! command -v gaianet &> /dev/null; then
-                echo "❌ GaiaNet is not installed. Please install it first."
-                return 0
-            fi
+echo "Detecting system configuration..."
+if ! command -v gaianet &> /dev/null; then
+    echo "❌ GaiaNet is not installed. Please install it first."
+    main_menu
+    return 0
+fi
 
-            gaianet_info=$(gaianet info 2>/dev/null)
-            if [[ -z "$gaianet_info" ]]; then
-                echo "❌ GaiaNet is not installed properly. Please check your installation."
-                return 0
-            elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
-                echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
-            else
-                echo "❌ GaiaNet is not installed properly. Please check your installation."
-                return 0
-            fi
-
+gaianet_info=$(gaianet info 2>/dev/null)
+if [[ -z "$gaianet_info" ]]; then
+    echo "❌ GaiaNet is not installed properly. Please check your installation."
+    main_menu
+    return 0
+elif [[ "$gaianet_info" == *"Node ID"* || "$gaianet_info" == *"Device ID"* ]]; then
+    echo "✅ GaiaNet is installed. Proceeding with chatbot setup."
+else
+    echo "❌ GaiaNet is not installed properly. Please check your installation."
+    main_menu
+    return 0
+fi
             check_if_vps_or_laptop() {
                 vps_type=$(systemd-detect-virt)
                 if echo "$vps_type" | grep -qiE "kvm|qemu|vmware|xen|lxc"; then
