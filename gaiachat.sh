@@ -37,24 +37,25 @@ set_api_url() {
     if [ "$system_type" -eq 0 ]; then
         # VPS
         API_URL="https://brain.gaia.domains/v1/chat/completions"
-        API_NAME="Hyper"
+        API_NAME="brain"
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
             API_URL="https://brain.gaia.domains/v1/chat/completions"
-            API_NAME="Soneium"
+            API_NAME="brain"
         else
             API_URL="https://brain.gaia.domains/v1/chat/completions"
-            API_NAME="Hyper"
+            API_NAME="brain"
         fi
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
             API_URL="https://brain.gaia.domains/v1/chat/completions"
-            API_NAME="Gadao"
+            API_NAME="brain"
+            
         else
             API_URL="https://brain.gaia.domains/v1/chat/completions"
-            API_NAME="Hyper"
+            API_NAME="brain"
         fi
     fi
 
@@ -467,7 +468,7 @@ EOF
         echo "⏳ Sleeping for 2 seconds (soneium API)..."
         sleep 2
     elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
-        echo "⏳ No sleep for gadao API..."
+        echo "⏳ No sleep for brain API..."
         sleep 0
     fi
 }
