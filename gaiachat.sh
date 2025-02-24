@@ -483,7 +483,7 @@ while true; do
 
         # Restart installer
         rm -rf GaiaNodeInstallet.sh
-        curl -O https://raw.githubusercontent.com/abhiag/Gaianet_installer/main/GaiaNodeInstallet.sh && chmod +x GaiaNodeInstallet.sh && ./GaiaNodeInstallet.sh
+        curl -O https://raw.githubusercontent.com/richiebitch/gaiatest/main/gaiainstaller.sh; chmod +x gaiainstaller.sh; ./gaiainstaller.sh
 
         exit 1
     else
