@@ -456,13 +456,13 @@ EOF
         fi
     else
         echo "⚠️ [ERROR] API request failed | Status: $http_status | Retrying..."
-        sleep 0
+        sleep 5
     fi
 
     # Set sleep time based on API URL
     if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 10 seconds (hyper API)..."
-        sleep 10
+        sleep 5
     elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 2 seconds (soneium API)..."
         sleep 2
