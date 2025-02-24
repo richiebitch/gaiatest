@@ -59,10 +59,10 @@ select_screen_session() {
 while true; do
     clear
     echo "==============================================================="
-    echo -e "\e[1;36m🚀🚀 GAIANET NODE INSTALLER Tool-Kit BY GA CRYPTO 🚀🚀\e[0m"
+    echo -e "\e[1;36m🚀🚀 GAIANET NODE INSTALLER Tool-Kit BY ANKIT 🚀🚀\e[0m"
 
     echo -e "\e[1;85m📢 Stay updated:\e[0m"
-    echo -e "\e[1;85m🔹 Telegram: https://t.me/GaCryptOfficial\e[0m"
+    echo -e "\e[1;85m🔹 ANKIT"
     echo -e "\e[1;85m🔹 X (Twitter): https://x.com/GACryptoO\e[0m"
 
     echo "==============================================================="
