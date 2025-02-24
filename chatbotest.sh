@@ -36,24 +36,24 @@ set_api_url() {
 
     if [ "$system_type" -eq 0 ]; then
         # VPS
-        API_URL="https://hyper.gaia.domains/v1/chat/completions"
+        API_URL="https://brain.gaia.domains/v1/chat/completions"
         API_NAME="Hyper"
     elif [ "$system_type" -eq 1 ]; then
         # Laptop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://soneium.gaia.domains/v1/chat/completions"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
             API_NAME="Soneium"
         else
-            API_URL="https://hyper.gaia.domains/v1/chat/completions"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
         fi
     elif [ "$system_type" -eq 2 ]; then
         # Desktop
         if [ "$cuda_present" -eq 0 ]; then
-            API_URL="https://gadao.gaia.domains/v1/chat/completions"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
             API_NAME="Gadao"
         else
-            API_URL="https://hyper.gaia.domains/v1/chat/completions"
+            API_URL="https://brain.gaia.domains/v1/chat/completions"
             API_NAME="Hyper"
         fi
     fi
@@ -80,7 +80,7 @@ fi
 
 # Function to get a random general question based on the API URL
 generate_random_general_question() {
-    if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
+    if [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
             "What color is the sky?"
             "How many legs does a dog have?"
@@ -185,7 +185,7 @@ generate_random_general_question() {
             "What do you wear on your head when riding a bike?"
             "What do you do when you hear music?"
         )
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
             "Who is the current President of the United States?"
             "What is the capital of Japan?"
@@ -298,7 +298,7 @@ generate_random_general_question() {
             "What do you wear on your head when riding a bike?"
             "What do you do when you hear music?"
         )
-    elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         general_questions=(
             "Who is the current President of the United States?"
             "What is the capital of Japan?"
@@ -460,13 +460,13 @@ EOF
     fi
 
     # Set sleep time based on API URL
-    if [[ "$API_URL" == "https://hyper.gaia.domains/v1/chat/completions" ]]; then
+    if [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 10 seconds (hyper API)..."
         sleep 5
-    elif [[ "$API_URL" == "https://soneium.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ Sleeping for 2 seconds (soneium API)..."
         sleep 2
-    elif [[ "$API_URL" == "https://gadao.gaia.domains/v1/chat/completions" ]]; then
+    elif [[ "$API_URL" == "https://brain.gaia.domains/v1/chat/completions" ]]; then
         echo "⏳ No sleep for gadao API..."
         sleep 0
     fi
