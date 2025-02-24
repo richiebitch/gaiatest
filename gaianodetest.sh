@@ -207,6 +207,6 @@ echo "🔍 Fetching GaiaNet node information..."
 # Closing message
 echo "==========================================================="
 echo "🎉 Congratulations! Your GaiaNet node is successfully set up!"
-echo "🌟 Stay connected: Telegram: https://t.me/GaCryptOfficial | Twitter: https://x.com/GACryptoO"
+echo "🌟 Stay connected: ANKITANKITANKITANKITANKITANKITANKITANKIT"
 echo "💪 Together, let's build the future of decentralized networks!"
 echo "===========================================================" 
